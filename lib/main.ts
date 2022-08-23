@@ -1,14 +1,16 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { Client, Collection, GatewayIntentBits } from 'discord.js';
-// TODO: Replace this with the import below when it becomes supported by eslint
-// (https://github.com/eslint/eslint/discussions/15305)
-// import config from './config.json' assert { type: 'json' };
-const config = JSON.parse(readFileSync('config.json'));
+import {
+  Client,
+  Collection,
+  SimplifiedCommand,
+  GatewayIntentBits
+} from 'discord.js';
+import gameManager from './game/GameManager.js';
+import config from '../config.json' assert { type: 'json' };
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-
-client.commands = new Collection();
+client.commands = new Collection<string, SimplifiedCommand>();
 const commandsPath = new URL('commands', import.meta.url).pathname;
 const commandFiles = readdirSync(commandsPath).filter((file) =>
   file.endsWith('.js')
@@ -16,11 +18,18 @@ const commandFiles = readdirSync(commandsPath).filter((file) =>
 
 for (const file of commandFiles) {
   const filePath = join(commandsPath, file);
-  const { default: command } = await import(filePath);
-  client.commands.set(command.data.name, command);
+  const { default: commandImport } = await import(filePath);
+  const command: SimplifiedCommand = {
+    name: commandImport.data.name,
+    execute: commandImport.execute
+  };
+  client.commands.set(command.name, command);
+  console.log('hi');
 }
+
 client.once('ready', () => {
   console.log('MTG Bot is ready!');
+  gameManager.increment();
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -31,7 +40,7 @@ client.on('interactionCreate', async (interaction) => {
   if (!command) return;
 
   try {
-    await command.execute(interaction);
+    command.execute(interaction);
   } catch (error) {
     console.error(error);
     await interaction.reply({

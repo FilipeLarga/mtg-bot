@@ -13,6 +13,6 @@
         "lib/**/*",
         "bin/**/*",
         "types/*",
-        "config.json",
+        "config.ts",
     ]
 }

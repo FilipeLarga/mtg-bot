@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord.js';
-import config from '../config.json' assert { type: 'json' };
+import { CLIENTID, TOKEN } from '../config.js';
 
 const commands = [];
 const commandsPath = new URL('../lib/commands', import.meta.url).pathname;
@@ -20,8 +20,8 @@ if (commands.length === 0) {
   throw new Error('No commands found to deploy');
 }
 
-const rest = new REST().setToken(config.token);
+const rest = new REST().setToken(TOKEN);
 rest
-  .put(Routes.applicationCommands(config.clientId), { body: commands })
+  .put(Routes.applicationCommands(CLIENTID), { body: commands })
   .then(() => console.log('Successfully registered application commands.'))
   .catch(console.error);

@@ -6,8 +6,10 @@ import {
   SimplifiedCommand,
   GatewayIntentBits
 } from 'discord.js';
-import gameManager from './game/GameManager.js';
-import config from '../config.json' assert { type: 'json' };
+import { TOKEN } from '../config.js';
+import { UserError } from './utils/errors.js';
+
+console.log('Starting MTG Bot...');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection<string, SimplifiedCommand>();
@@ -24,12 +26,10 @@ for (const file of commandFiles) {
     execute: commandImport.execute
   };
   client.commands.set(command.name, command);
-  console.log('hi');
 }
 
 client.once('ready', () => {
   console.log('MTG Bot is ready!');
-  gameManager.increment();
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -40,14 +40,20 @@ client.on('interactionCreate', async (interaction) => {
   if (!command) return;
 
   try {
-    command.execute(interaction);
-  } catch (error) {
-    console.error(error);
+    await command.execute(interaction);
+  } catch (e) {
+    let errorMessage;
+    if (e instanceof UserError) {
+      errorMessage = e.message;
+    } else {
+      errorMessage = 'There was an error while executing this command!';
+      console.log(e);
+    }
     await interaction.reply({
-      content: 'There was an error while executing this command!',
+      content: errorMessage,
       ephemeral: true
     });
   }
 });
 
-client.login(config.token);
+client.login(TOKEN);

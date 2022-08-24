@@ -7,6 +7,6 @@ declare module "discord.js" {
 
     export interface SimplifiedCommand {
         name: string,
-        execute: (interaction: CommandInteraction) => void
+        execute: (interaction: CommandInteraction) => Promise<void>
     }
 }

@@ -2,7 +2,7 @@
 build/
 
 # Config
-config.json
+config.ts
 
 # Logs
 logs

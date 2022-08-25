@@ -2,6 +2,9 @@
     "files.autoSave": "afterDelay",
     "editor.fontSize": 15,
     "editor.wordWrap": "bounded",
-    "editor.wordWrapColumn": 100,
     "explorer.excludeGitIgnore": true
 }
+    "editor.wordWrapColumn": 110,
+    "editor.rulers": [
+        110
+    ],

@@ -8,8 +8,8 @@
     "build": "rm -rf build/ && tsc",
     "start": "node build/lib/main.js",
     "dev": "npm run build && npm start",
-    "register": "npm run build && node build/bin/register-commands.js",
-    "delete": "npm run build && node build/bin/delete-commands.js",
+    "register": "npm run build && node build/bin/register_commands.js",
+    "delete": "npm run build && node build/bin/delete_commands.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

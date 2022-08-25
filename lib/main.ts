@@ -11,7 +11,9 @@ import { UserError } from './utils/errors.js';
 
 console.log('Starting MTG Bot...');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
+});
 client.commands = new Collection<string, SimplifiedCommand>();
 const commandsPath = new URL('commands', import.meta.url).pathname;
 const commandFiles = readdirSync(commandsPath).filter((file) =>
@@ -33,7 +35,8 @@ client.once('ready', () => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+  if (!interaction.isChatInputCommand() && !interaction.isAutocomplete())
+    return;
 
   const command = client.commands.get(interaction.commandName);
 
@@ -49,10 +52,12 @@ client.on('interactionCreate', async (interaction) => {
       errorMessage = 'There was an error while executing this command!';
       console.log(e);
     }
-    await interaction.reply({
-      content: errorMessage,
-      ephemeral: true
-    });
+    if (interaction.isChatInputCommand()) {
+      await interaction.reply({
+        content: errorMessage,
+        ephemeral: true
+      });
+    }
   }
 });
 
